@@ -6,24 +6,22 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "customer")
 public class Customer {
     @Id
-    private Integer idCustomer;
+    private String idCustomer;
     private String name;
-    private String lastname;
 
     public Customer() {
     }
 
-    public Customer(Integer idCustomer, String name, String lastname) {
+    public Customer(String idCustomer, String name) {
         this.idCustomer = idCustomer;
         this.name = name;
-        this.lastname = lastname;
     }
 
-    public Integer getIdCustomer() {
+    public String getIdCustomer() {
         return this.idCustomer;
     }
 
-    public void setIdCustomer(Integer idCustomer) {
+    public void setIdCustomer(String idCustomer) {
         this.idCustomer = idCustomer;
     }
 
@@ -35,20 +33,11 @@ public class Customer {
         this.name = name;
     }
 
-    public String getLastname() {
-        return this.lastname;
-    }
-
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
-    }
-
     @Override
     public String toString() {
         return "{" +
             " idCustomer='" + getIdCustomer() + "'" +
             ", name='" + getName() + "'" +
-            ", lastname='" + getLastname() + "'" +
             "}";
     }
 }
