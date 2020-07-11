@@ -1,10 +1,6 @@
 package com.project1.customer.controllers;
 
-import java.util.List;
-
-import com.project1.customer.model.Business;
 import com.project1.customer.model.Customer;
-import com.project1.customer.model.Personal;
 import com.project1.customer.repositories.CustomerRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
