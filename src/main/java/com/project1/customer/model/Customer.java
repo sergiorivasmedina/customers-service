@@ -8,13 +8,16 @@ public class Customer {
     @Id
     private String idCustomer;
     private String name;
+    private int type;
+    private String objectId;
 
     public Customer() {
     }
 
-    public Customer(String idCustomer, String name) {
-        this.idCustomer = idCustomer;
+    public Customer(String name, int type, String objectId) {
         this.name = name;
+        this.type = type;
+        this.objectId = objectId;
     }
 
     public String getIdCustomer() {
@@ -33,11 +36,29 @@ public class Customer {
         this.name = name;
     }
 
+    public int getType() {
+        return this.type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public String getObjectId() {
+        return this.objectId;
+    }
+
+    public void setObjectId(String objectId) {
+        this.objectId = objectId;
+    }
+
     @Override
     public String toString() {
         return "{" +
             " idCustomer='" + getIdCustomer() + "'" +
             ", name='" + getName() + "'" +
+            ", type='" + getType() + "'" +
+            ", objectId='" + getObjectId() + "'" +
             "}";
     }
 }

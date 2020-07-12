@@ -1,10 +1,13 @@
 package com.project1.customer.model;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "personal")
-public class Personal extends Customer {
+public class Personal {
 
+    @Id
+    private String idPersonal;
     private String dni;
 
     public Personal() {
@@ -12,6 +15,19 @@ public class Personal extends Customer {
 
     public Personal(String dni) {
         this.dni = dni;
+    }
+
+    public Personal(String idPersonal, String dni) {
+        this.idPersonal = idPersonal;
+        this.dni = dni;
+    }
+
+    public String getIdPersonal() {
+        return this.idPersonal;
+    }
+
+    public void setIdPersonal(String idPersonal) {
+        this.idPersonal = idPersonal;
     }
 
     public String getDni() {
@@ -25,7 +41,8 @@ public class Personal extends Customer {
     @Override
     public String toString() {
         return "{" +
-            " dni='" + getDni() + "'" +
+            " idPersonal='" + getIdPersonal() + "'" +
+            ", dni='" + getDni() + "'" +
             "}";
     }
 }
