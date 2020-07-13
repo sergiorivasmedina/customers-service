@@ -46,12 +46,6 @@ public class CustomerController {
         return customerRepository.findAll();
     }
 
-    @PostMapping(value = "/prueba")
-    public Mono<Personal> newPersonal(@RequestBody Personal newPersonal) {
-        // adding a new personal to the collection
-        return personalRepository.save(newPersonal);
-    }
-
     @PostMapping(value = "/customer/new")
     public void newCustomer(@RequestBody CustomerDTO newCustomerDTO) {
 
