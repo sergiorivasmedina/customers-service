@@ -11,3 +11,6 @@ docker run --restart always --name custumers -8080:9000 -d costumers:latest
 
 ### Sonarqube
 docker run -d --name sonarqube -p 8090:9000 sonarqube
+
+## Arquitectura de Microservicio
+![Arquitectura](arquitectura.png)
