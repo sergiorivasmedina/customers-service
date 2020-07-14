@@ -7,7 +7,7 @@ cd /project1-customers
 
 docker build -t "customers"
 
-docker run --restart always --name custumers -8080:9000 -d costumers:latest
+docker run --restart always --name customers -8080:9000 -d costomers:latest
 
 ### Sonarqube
 docker run -d --name sonarqube -p 8090:9000 sonarqube
