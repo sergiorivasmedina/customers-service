@@ -1,9 +1,9 @@
-# Everis project1 customers
+# Everis Project 2 Customers
 
 Java Spring Boot Backend connected to mongodb.
 
 ### Command for run Dockerfile and start container
-cd /project1-customers
+cd /customers
 
 docker build -t "customers"
 

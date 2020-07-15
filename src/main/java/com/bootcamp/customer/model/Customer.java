@@ -1,4 +1,4 @@
-package com.project1.customer.model;
+package com.bootcamp.customer.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;

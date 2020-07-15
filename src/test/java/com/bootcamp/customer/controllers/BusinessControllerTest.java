@@ -1,12 +1,12 @@
-package com.project1.customer.controllers;
+package com.bootcamp.customer.controllers;
 
 import static org.mockito.Mockito.times;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.project1.customer.model.Business;
-import com.project1.customer.repositories.BusinessRepository;
+import com.bootcamp.customer.model.Business;
+import com.bootcamp.customer.repositories.BusinessRepository;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

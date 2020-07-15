@@ -1,7 +1,7 @@
-package com.project1.customer.controllers;
+package com.bootcamp.customer.controllers;
 
-import com.project1.customer.model.Personal;
-import com.project1.customer.repositories.PersonalRepository;
+import com.bootcamp.customer.model.Personal;
+import com.bootcamp.customer.repositories.PersonalRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

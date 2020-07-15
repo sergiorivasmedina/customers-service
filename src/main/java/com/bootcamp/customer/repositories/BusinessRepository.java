@@ -1,6 +1,6 @@
-package com.project1.customer.repositories;
+package com.bootcamp.customer.repositories;
 
-import com.project1.customer.model.Business;
+import com.bootcamp.customer.model.Business;
 
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;

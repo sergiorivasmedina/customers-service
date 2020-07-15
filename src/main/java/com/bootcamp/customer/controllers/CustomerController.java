@@ -1,12 +1,12 @@
-package com.project1.customer.controllers;
+package com.bootcamp.customer.controllers;
 
-import com.project1.customer.dto.CustomerDTO;
-import com.project1.customer.model.Business;
-import com.project1.customer.model.Customer;
-import com.project1.customer.model.Personal;
-import com.project1.customer.repositories.BusinessRepository;
-import com.project1.customer.repositories.CustomerRepository;
-import com.project1.customer.repositories.PersonalRepository;
+import com.bootcamp.customer.dto.CustomerDTO;
+import com.bootcamp.customer.model.Business;
+import com.bootcamp.customer.model.Customer;
+import com.bootcamp.customer.model.Personal;
+import com.bootcamp.customer.repositories.BusinessRepository;
+import com.bootcamp.customer.repositories.CustomerRepository;
+import com.bootcamp.customer.repositories.PersonalRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

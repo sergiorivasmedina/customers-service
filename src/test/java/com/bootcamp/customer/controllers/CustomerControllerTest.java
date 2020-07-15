@@ -1,4 +1,4 @@
-package com.project1.customer.controllers;
+package com.bootcamp.customer.controllers;
 
 public class CustomerControllerTest {
     

@@ -1,4 +1,4 @@
-package com.project1.customer.dto;
+package com.bootcamp.customer.dto;
 
 public class CustomerDTO {
     private String name;
