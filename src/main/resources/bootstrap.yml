@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: customers
+  cloud:
+    config:
+      uri:
+      - http://localhost:8079
+      username: root
+      password: sergio
