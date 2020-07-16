@@ -1,7 +1,7 @@
 package com.bootcamp.customer.controllers;
 
 import com.bootcamp.customer.model.Business;
-import com.bootcamp.customer.repositories.BusinessRepository;
+import com.bootcamp.customer.services.BusinessService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,25 +25,25 @@ import reactor.core.publisher.Mono;
 public class BusinessController {
     
     @Autowired
-    private BusinessRepository businessRepository;
+    private BusinessService businessService;
 
     @GetMapping(value = "/business")
     public @ResponseBody Flux<Business> getAllBusiness() {
         // list all data in business collection
-        return businessRepository.findAll();
+        return businessService.findAll();
     }
 
     @PostMapping(value = "/business/new")
     public Mono<Business> newBusiness(@RequestBody Business newBusiness) {
         // adding a new business to the collection
-        return businessRepository.save(newBusiness);
+        return businessService.save(newBusiness);
     }
 
     @PutMapping(value = "/business/{businessId}")
     public Mono<ResponseEntity<Business>> updateBusiness(@PathVariable(name = "businessId") String businessId, @RequestBody Business business) {
-        return businessRepository.findById(businessId)
+        return businessService.findById(businessId)
             .flatMap(existingBusiness -> {
-                return businessRepository.save(business);
+                return businessService.save(business);
             })
             .map(updateBusiness -> new ResponseEntity<>(updateBusiness, HttpStatus.OK))
             .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
@@ -51,9 +51,9 @@ public class BusinessController {
 
     @DeleteMapping(value = "/business/{businessId}")
     public Mono<ResponseEntity<Void>> deleteBusiness(@PathVariable(name = "businessId") String businesId) {
-        return businessRepository.findById(businesId)
+        return businessService.findById(businesId)
             .flatMap(existingBusiness ->
-                businessRepository.delete(existingBusiness)
+                businessService.delete(existingBusiness)
                     .then(Mono.just(new ResponseEntity<Void>(HttpStatus.OK))) 
             )
             .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));

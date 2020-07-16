@@ -4,12 +4,10 @@ import com.bootcamp.customer.dto.CustomerDTO;
 import com.bootcamp.customer.model.Business;
 import com.bootcamp.customer.model.Customer;
 import com.bootcamp.customer.model.Personal;
-import com.bootcamp.customer.repositories.BusinessRepository;
-import com.bootcamp.customer.repositories.CustomerRepository;
-import com.bootcamp.customer.repositories.PersonalRepository;
+import com.bootcamp.customer.services.BusinessService;
+import com.bootcamp.customer.services.CustomerService;
+import com.bootcamp.customer.services.PersonalService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,20 +28,18 @@ import reactor.core.publisher.Mono;
 @RestController
 @CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE, RequestMethod.PUT})
 public class CustomerController {
-
-    private static final Logger log = LoggerFactory.getLogger(CustomerController.class);
     
     @Autowired
-    private CustomerRepository customerRepository;
+    private CustomerService customerService;
     @Autowired
-    private PersonalRepository personalRepository;
+    private PersonalService personalService;
     @Autowired
-    private BusinessRepository BusinessRepository;
+    private BusinessService businessService;
 
     @GetMapping(value = "/customers")
     public @ResponseBody Flux<Customer> getAllCustomers() {
         // list all data in customer collection
-        return customerRepository.findAll();
+        return customerService.findAll();
     }
 
     @PostMapping(value = "/customer/new")
@@ -52,11 +48,11 @@ public class CustomerController {
         if (newCustomerDTO.getType() == 1) {
             // type=1 is Personal Customer
             Personal p = new Personal(newCustomerDTO.getIdentityNumber());
-            personalRepository.save(p)
+            personalService.save(p)
                     .flatMap(per -> {
                         // adding a new customer to the collection
                         Customer c = new Customer(newCustomerDTO.getName(), newCustomerDTO.getType(),per.getIdPersonal());
-                        return customerRepository.save(c);
+                        return customerService.save(c);
                     })
                     .subscribe();
         }
@@ -64,11 +60,11 @@ public class CustomerController {
             //type=2 is Business Customer
             Business b = new Business();
             b.setRuc(newCustomerDTO.getIdentityNumber());
-            BusinessRepository.save(b)
+            businessService.save(b)
                     .flatMap(bus -> {
                         // adding a new customer to the collection
                         Customer c = new Customer(newCustomerDTO.getName(), newCustomerDTO.getType(),bus.getIdBusiness());
-                        return customerRepository.save(c);
+                        return customerService.save(c);
                     })
                     .subscribe();
         }
@@ -76,9 +72,9 @@ public class CustomerController {
 
     @PutMapping(value = "/customer/{customerId}")
     public Mono <ResponseEntity<Customer>> updateCustomer(@PathVariable(name = "customerId") String customerId, @RequestBody Customer customer) {
-        return customerRepository.findById(customerId)
+        return customerService.findById(customerId)
             .flatMap(existingCustomer -> {
-                return customerRepository.save(customer);
+                return customerService.save(customer);
             })
             .map(updateCustomer -> new ResponseEntity<>(updateCustomer, HttpStatus.OK))
             .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
@@ -86,9 +82,9 @@ public class CustomerController {
 
     @DeleteMapping(value = "/customer/{customerId}")
     public Mono<ResponseEntity<Void>> deleteCustomer(@PathVariable(name = "customerId") String customerId) {
-        return customerRepository.findById(customerId)
+        return customerService.findById(customerId)
             .flatMap(existingCustomer ->
-                customerRepository.delete(existingCustomer)
+                customerService.delete(existingCustomer)
                     .then(Mono.just(new ResponseEntity<Void>(HttpStatus.OK))) 
             )
             .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
