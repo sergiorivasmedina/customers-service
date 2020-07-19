@@ -47,7 +47,7 @@ public class CustomerController {
 
         if (newCustomerDTO.getType() == 1) {
             // type=1 is Personal Customer
-            Personal p = new Personal(newCustomerDTO.getIdentityNumber());
+            Personal p = new Personal("Personal", newCustomerDTO.getIdentityNumber());
             personalService.save(p)
                     .flatMap(per -> {
                         // adding a new customer to the collection

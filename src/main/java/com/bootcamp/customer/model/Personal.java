@@ -17,4 +17,9 @@ public class Personal {
     private String idPersonal;
     private String description;
     private String dni;
+
+    public Personal(String description, String dni){
+        this.description = description;
+        this.dni = dni;
+    }
 }

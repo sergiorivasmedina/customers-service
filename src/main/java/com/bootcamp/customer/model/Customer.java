@@ -17,4 +17,10 @@ public class Customer {
     private String name;
     private int type;
     private String objectId;
+
+    public Customer(String name, int type, String objectId) {
+        this.name = name;
+        this.type = type;
+        this.objectId = objectId;
+    }
 }
