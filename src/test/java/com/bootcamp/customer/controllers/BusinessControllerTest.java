@@ -33,7 +33,7 @@ public class BusinessControllerTest {
     
     @Test
     public void getAllBusinessCustmers() {
-        Business business = new Business("1", "2035648751");
+        Business business = new Business("1", "Business", "2035648751");
 
         List<Business> list = new ArrayList<Business>();
         list.add(business);
@@ -56,7 +56,7 @@ public class BusinessControllerTest {
 
     @Test
     public void newBusiness() {
-        Business business = new Business("1", "2035648751");
+        Business business = new Business("1", "Business", "2035648751");
 
         Mockito
             .when(repository.save(business))
@@ -73,7 +73,7 @@ public class BusinessControllerTest {
 
     @Test
     public void deleteAccountType() {
-        Business business = new Business("1", "2035648751");
+        Business business = new Business("1", "Business", "2035648751");
 
         Mockito
             .when(repository.findById("1"))

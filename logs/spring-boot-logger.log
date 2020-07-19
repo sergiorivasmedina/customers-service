@@ -1,4 +1,0 @@
-2020-07-18 17:50:00,438 INFO org.springframework.boot.SpringApplication [restartedMain] No active profile set, falling back to default profiles: default
-2020-07-18 17:50:10,455 INFO org.springframework.boot.StartupInfoLogger [restartedMain] Started App in 15.427 seconds (JVM running for 16.307)
-2020-07-18 17:53:18,541 INFO org.springframework.boot.SpringApplication [restartedMain] No active profile set, falling back to default profiles: default
-2020-07-18 17:53:28,081 INFO org.springframework.boot.StartupInfoLogger [restartedMain] Started App in 17.034 seconds (JVM running for 17.718)

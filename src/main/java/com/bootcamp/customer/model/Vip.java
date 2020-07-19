@@ -10,11 +10,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "personal")
-public class Personal {
-
+@Document(collection = "vip")
+public class Vip {
     @Id
-    private String idPersonal;
+    private String idVip;
     private String description;
     private String dni;
 }

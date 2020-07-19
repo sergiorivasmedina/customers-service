@@ -33,7 +33,7 @@ public class PersonalControllerTest {
     
     @Test
     public void getAllPersonalCsutmers() {
-        Personal personal = new Personal("1", "71205568");
+        Personal personal = new Personal("1", "Personal", "71205568");
 
         List<Personal> list = new ArrayList<Personal>();
         list.add(personal);
@@ -56,7 +56,7 @@ public class PersonalControllerTest {
 
     @Test
     public void newPersonal() {
-        Personal personal = new Personal("1", "71205568");
+        Personal personal = new Personal("1", "Personal", "71205568");
 
         Mockito
             .when(repository.save(personal))
@@ -73,7 +73,7 @@ public class PersonalControllerTest {
 
     @Test
     public void deleteAccountType() {
-        Personal personal = new Personal("1", "71205568");
+        Personal personal = new Personal("1", "Personal", "71205568");
 
         Mockito
             .when(repository.findById("1"))
