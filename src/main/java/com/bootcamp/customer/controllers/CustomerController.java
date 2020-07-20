@@ -1,5 +1,6 @@
 package com.bootcamp.customer.controllers;
 
+import com.bootcamp.customer.dto.BalanceSummaryDTO;
 import com.bootcamp.customer.dto.CustomerDTO;
 import com.bootcamp.customer.model.Business;
 import com.bootcamp.customer.model.Customer;
@@ -88,5 +89,18 @@ public class CustomerController {
                     .then(Mono.just(new ResponseEntity<Void>(HttpStatus.OK))) 
             )
             .defaultIfEmpty(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    //find customer by Id
+    @GetMapping(value = "/customer/name/{customerId}")
+    public Mono<Customer> getCustomerName(@PathVariable(name = "customerId") String customerId) {
+        return customerService.findById(customerId)
+                .defaultIfEmpty(new Customer("0","No se encontró cliente",0,"No se encontró identidad"));
+    }
+
+    //Balance Summary
+    @GetMapping(value = "/customer/{customerId}/balance/summary")
+    public BalanceSummaryDTO balanaceSummary(@PathVariable(name = "customerId") String customerId) {
+        return customerService.balanceSummary(customerId);
     }
 }
