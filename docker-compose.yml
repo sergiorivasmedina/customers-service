@@ -1,0 +1,16 @@
+version: "3.5"
+
+services:
+  customers:
+    container_name: customers
+    build: .
+    restart: always
+    ports:
+        - 8081:8081
+    networks: 
+        - bank-network
+
+networks:
+    bank-network:
+        external: 
+            name: bank-network
