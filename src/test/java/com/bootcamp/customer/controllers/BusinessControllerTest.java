@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bootcamp.customer.model.Business;
-import com.bootcamp.customer.repositories.BusinessRepository;
+import com.bootcamp.customer.services.BusinessService;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +26,7 @@ import reactor.core.publisher.Mono;
 @WebFluxTest(controllers = BusinessController.class)
 public class BusinessControllerTest {
     @MockBean
-    BusinessRepository repository;
+    BusinessService service;
 
     @Autowired
     private WebTestClient webclient;
@@ -41,7 +41,7 @@ public class BusinessControllerTest {
         Flux<Business> businessFlux = Flux.fromIterable(list);
 
         Mockito
-            .when(repository.findAll())
+            .when(service.findAll())
             .thenReturn(businessFlux);
 
         webclient.get()
@@ -51,7 +51,7 @@ public class BusinessControllerTest {
             .expectStatus().isOk()
             .expectBodyList(Business.class);
 
-            Mockito.verify(repository, times(1)).findAll();
+            Mockito.verify(service, times(1)).findAll();
     }
 
     @Test
@@ -59,7 +59,7 @@ public class BusinessControllerTest {
         Business business = new Business("1", "Business", "2035648751");
 
         Mockito
-            .when(repository.save(business))
+            .when(service.save(business))
             .thenReturn(Mono.just(business));
         
         webclient.post()
@@ -76,12 +76,12 @@ public class BusinessControllerTest {
         Business business = new Business("1", "Business", "2035648751");
 
         Mockito
-            .when(repository.findById("1"))
+            .when(service.findById("1"))
             .thenReturn(Mono.just(business));
 
         Mono<Void> voidReturn  = Mono.empty();
         Mockito
-            .when(repository.delete(business))
+            .when(service.delete(business))
             .thenReturn(voidReturn);
 
 	    webclient.delete()

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.bootcamp.customer.model.Personal;
-import com.bootcamp.customer.repositories.PersonalRepository;
+import com.bootcamp.customer.services.PersonalService;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +26,7 @@ import reactor.core.publisher.Mono;
 @WebFluxTest(controllers = PersonalController.class)
 public class PersonalControllerTest {
     @MockBean
-    PersonalRepository repository;
+    PersonalService service;
 
     @Autowired
     private WebTestClient webclient;
@@ -41,7 +41,7 @@ public class PersonalControllerTest {
         Flux<Personal> personalFlux = Flux.fromIterable(list);
 
         Mockito
-            .when(repository.findAll())
+            .when(service.findAll())
             .thenReturn(personalFlux);
 
         webclient.get()
@@ -51,7 +51,7 @@ public class PersonalControllerTest {
             .expectStatus().isOk()
             .expectBodyList(Personal.class);
 
-            Mockito.verify(repository, times(1)).findAll();
+            Mockito.verify(service, times(1)).findAll();
     }
 
     @Test
@@ -59,7 +59,7 @@ public class PersonalControllerTest {
         Personal personal = new Personal("1", "Personal", "71205568");
 
         Mockito
-            .when(repository.save(personal))
+            .when(service.save(personal))
             .thenReturn(Mono.just(personal));
         
         webclient.post()
@@ -76,12 +76,12 @@ public class PersonalControllerTest {
         Personal personal = new Personal("1", "Personal", "71205568");
 
         Mockito
-            .when(repository.findById("1"))
+            .when(service.findById("1"))
             .thenReturn(Mono.just(personal));
 
         Mono<Void> voidReturn  = Mono.empty();
         Mockito
-            .when(repository.delete(personal))
+            .when(service.delete(personal))
             .thenReturn(voidReturn);
 
 	    webclient.delete()
