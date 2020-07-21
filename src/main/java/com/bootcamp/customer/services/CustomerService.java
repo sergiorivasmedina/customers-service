@@ -11,12 +11,15 @@ import com.bootcamp.customer.repositories.CustomerRepository;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -26,12 +29,20 @@ public class CustomerService {
     private final String customersUri = "http://localhost:8081";
     private final String accountsUri = "http://localhost:8082";
     private final String creditsUri = "http://localhost:8083";
+    Logger logger = LoggerFactory.getLogger(CustomerService.class);
 
     @Autowired
     private CustomerRepository customerRepository;
 
+    @CircuitBreaker(name = "service1", fallbackMethod = "fallbackForFindAll")
     public Flux<Customer> findAll() {
         return customerRepository.findAll();
+    }
+
+    //fallback
+    public Flux<Customer> fallbackForFindAll(Throwable t) {
+        logger.error("Inside Circuit Breaker fallbackForFindAll, cause {}", t.toString());
+        return Flux.empty();
     }
 
     public Mono<Customer> save(Customer newCustomer) {
