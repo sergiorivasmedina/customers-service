@@ -3,11 +3,17 @@ package com.bootcamp.customer.controllers;
 import com.bootcamp.customer.dto.BalanceSummaryDTO;
 import com.bootcamp.customer.dto.CustomerDTO;
 import com.bootcamp.customer.model.Business;
+import com.bootcamp.customer.model.Corporate;
 import com.bootcamp.customer.model.Customer;
 import com.bootcamp.customer.model.Personal;
+import com.bootcamp.customer.model.Pyme;
+import com.bootcamp.customer.model.Vip;
 import com.bootcamp.customer.services.BusinessService;
+import com.bootcamp.customer.services.CorporateService;
 import com.bootcamp.customer.services.CustomerService;
 import com.bootcamp.customer.services.PersonalService;
+import com.bootcamp.customer.services.PymeService;
+import com.bootcamp.customer.services.VipService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,6 +42,12 @@ public class CustomerController {
     private PersonalService personalService;
     @Autowired
     private BusinessService businessService;
+    @Autowired
+    private VipService vipService;
+    @Autowired
+    private PymeService pymeService;
+    @Autowired
+    private CorporateService corporateService;
 
     @GetMapping(value = "/customers")
     public @ResponseBody Flux<Customer> getAllCustomers() {
@@ -52,7 +64,7 @@ public class CustomerController {
             personalService.save(p)
                     .flatMap(per -> {
                         // adding a new customer to the collection
-                        Customer c = new Customer(newCustomerDTO.getName(), newCustomerDTO.getType(),per.getIdPersonal());
+                        Customer c = new Customer(newCustomerDTO.getName(), newCustomerDTO.getType(),per.getIdPersonal(), newCustomerDTO.getBankId());
                         return customerService.save(c);
                     })
                     .subscribe();
@@ -60,14 +72,42 @@ public class CustomerController {
         else if(newCustomerDTO.getType() == 2) {
             //type=2 is Business Customer
             Business b = new Business();
+            b.setDescription("Empresa");
             b.setRuc(newCustomerDTO.getIdentityNumber());
             businessService.save(b)
                     .flatMap(bus -> {
                         // adding a new customer to the collection
-                        Customer c = new Customer(newCustomerDTO.getName(), newCustomerDTO.getType(),bus.getIdBusiness());
+                        Customer c = new Customer(newCustomerDTO.getName(), newCustomerDTO.getType(),bus.getIdBusiness(), newCustomerDTO.getBankId());
                         return customerService.save(c);
                     })
                     .subscribe();
+        } else if (newCustomerDTO.getType() == 3) {
+            //VIP
+            Vip vip = new Vip("VIP", newCustomerDTO.getIdentityNumber());
+            vipService.save(vip)
+                .flatMap(vipCustomer -> {
+                    Customer c = new Customer(newCustomerDTO.getName(), newCustomerDTO.getType(),vipCustomer.getDni(), newCustomerDTO.getBankId());
+                    return customerService.save(c);
+                })
+                .subscribe();
+        } else if (newCustomerDTO.getType() == 4) {
+            //PYME
+            Pyme pyme = new Pyme("PYME", newCustomerDTO.getIdentityNumber());
+            pymeService.save(pyme)
+                .flatMap(pymeCustomer -> {
+                    Customer c = new Customer(newCustomerDTO.getName(), newCustomerDTO.getType(),pymeCustomer.getRuc(), newCustomerDTO.getBankId());
+                    return customerService.save(c);
+                })
+                .subscribe();
+        } else if (newCustomerDTO.getType() == 5) {
+            //Corporate
+            Corporate corporate = new Corporate("Corporación", newCustomerDTO.getIdentityNumber());
+            corporateService.save(corporate)
+                .flatMap(corp -> {
+                    Customer c = new Customer(newCustomerDTO.getName(), newCustomerDTO.getType(),corp.getRuc(), newCustomerDTO.getBankId());
+                    return customerService.save(c);
+                })
+                .subscribe();
         }
     }
 
@@ -95,7 +135,7 @@ public class CustomerController {
     @GetMapping(value = "/customer/name/{customerId}")
     public Mono<Customer> getCustomerName(@PathVariable(name = "customerId") String customerId) {
         return customerService.findById(customerId)
-                .defaultIfEmpty(new Customer("0","No se encontró cliente",0,"No se encontró identidad"));
+                .defaultIfEmpty(new Customer("0","No se encontró cliente",0,"No se encontró identidad","No se encontró banco"));
     }
 
     //Balance Summary

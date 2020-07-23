@@ -16,4 +16,9 @@ public class Corporate {
     private String idCorporate;
     private String description;
     private String ruc;
+
+    public Corporate(String description, String ruc) {
+        this.description = description;
+        this.ruc = ruc;
+    }
 }

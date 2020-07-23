@@ -16,4 +16,9 @@ public class Pyme {
     private String idPyme;
     private String description;
     private String ruc;
+
+    public Pyme(String description, String ruc) {
+        this.description = description;
+        this.ruc = ruc;
+    }
 }

@@ -16,4 +16,9 @@ public class Vip {
     private String idVip;
     private String description;
     private String dni;
+
+    public Vip(String description, String dni) {
+        this.description = description;
+        this.dni = dni;
+    }
 }
