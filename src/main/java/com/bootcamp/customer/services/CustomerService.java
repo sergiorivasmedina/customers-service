@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+import com.bootcamp.customer.dto.AccountTypeCustomerDTO;
 import com.bootcamp.customer.dto.BalanceSummaryDTO;
 import com.bootcamp.customer.dto.BankAccountDTO;
 import com.bootcamp.customer.dto.BankDTO;
@@ -186,7 +187,7 @@ public class CustomerService {
 
                 });
 
-        return customerAndType.flatMap(customer -> {
+        customerAndType = customerAndType.flatMap(customer -> {
             return WebClient.create(banksUri + "/bank/" + customer.getBankId())
                     .get()
                     .retrieve()
@@ -194,5 +195,25 @@ public class CustomerService {
                     .map(bank -> new CustomerAndTypeDTO(customer, bank.getName()))
                     .defaultIfEmpty(customer);
         });
+
+        return customerAndType;
+    }
+
+    public Flux<AccountTypeCustomerDTO> getAccountInfoByCustomerId(String customerId) {
+        return WebClient.create(accountsUri + "/account/search/" + customerId)
+                .get()
+                .retrieve()
+                .bodyToFlux(AccountTypeCustomerDTO.class)
+                .flatMap(atc -> {
+                    return WebClient.create(accountsUri + "/account/type/search/" + atc.getAccountType())
+                            .get()
+                            .accept(MediaType.TEXT_PLAIN)
+                            .retrieve()
+                            .toEntity(String.class)
+                            .map(item -> {
+                                atc.setName(item.getBody());
+                                return atc;
+                            });
+                });
     }
 }

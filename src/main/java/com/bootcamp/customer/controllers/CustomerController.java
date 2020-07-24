@@ -1,5 +1,6 @@
 package com.bootcamp.customer.controllers;
 
+import com.bootcamp.customer.dto.AccountTypeCustomerDTO;
 import com.bootcamp.customer.dto.BalanceSummaryDTO;
 import com.bootcamp.customer.dto.CustomerAndTypeDTO;
 import com.bootcamp.customer.dto.CustomerDTO;
@@ -151,12 +152,8 @@ public class CustomerController {
         return customerService.getCustomerByIdentityNumber(id);
     }
 
-    //Perfil consolidado con todos los productos un cliente
-    // @GetMapping(value = "/bank/consolidated-profile/{customerId}")
-    // public void getConsolidatedProfile(@PathVariable(name = "customerId") String customerId) {
-    //     //get data from customers service using customerId
-    //     //get data from banks service using bankId
-    //     //get data from accounts service using customerId
-    //     //get data from credits service using customerId
-    // }
+    @GetMapping(value = "/hola/{customerId}")
+    public Flux<AccountTypeCustomerDTO> getHola(@PathVariable(name = "customerId") String customerId) {
+        return customerService.getAccountInfoByCustomerId(customerId);
+    }
 }
