@@ -17,12 +17,14 @@ public class Customer {
     private String name;
     private int type;
     private String objectId;
+    private String identityNumber;
     private String bankId;
 
-    public Customer(String name, int type, String objectId, String bankId) {
+    public Customer(String name, int type, String objectId, String id,String bankId) {
         this.name = name;
         this.type = type;
         this.objectId = objectId;
+        this.identityNumber = id;
         this.bankId = bankId;
     }
 }

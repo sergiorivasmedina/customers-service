@@ -2,12 +2,21 @@ package com.bootcamp.customer.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import com.bootcamp.customer.dto.BalanceSummaryDTO;
 import com.bootcamp.customer.dto.BankAccountDTO;
+import com.bootcamp.customer.dto.BankDTO;
 import com.bootcamp.customer.dto.CreditDTO;
+import com.bootcamp.customer.dto.CustomerAndTypeDTO;
 import com.bootcamp.customer.model.Customer;
+import com.bootcamp.customer.model.Personal;
+import com.bootcamp.customer.repositories.BusinessRepository;
+import com.bootcamp.customer.repositories.CorporateRepository;
 import com.bootcamp.customer.repositories.CustomerRepository;
+import com.bootcamp.customer.repositories.PersonalRepository;
+import com.bootcamp.customer.repositories.PymeRepository;
+import com.bootcamp.customer.repositories.VipRepository;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -18,6 +27,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import reactor.core.publisher.Flux;
@@ -29,11 +39,23 @@ public class CustomerService {
     private final String customersUri = "http://localhost:8081";
     private final String accountsUri = "http://localhost:8082";
     private final String creditsUri = "http://localhost:8083";
+    private final String banksUri = "http://localhost:8084";
+
     Logger logger = LoggerFactory.getLogger(CustomerService.class);
 
     @Autowired
     private CustomerRepository customerRepository;
-
+    @Autowired
+    private PersonalRepository personalRepository;
+    @Autowired
+    private BusinessRepository businessRepository;
+    @Autowired
+    private VipRepository vipRepository;
+    @Autowired
+    private PymeRepository pymeRepository;
+    @Autowired
+    private CorporateRepository corporateRepository;
+    
     @CircuitBreaker(name = "service1", fallbackMethod = "fallbackForFindAll")
     public Flux<Customer> findAll() {
         return customerRepository.findAll();
@@ -123,5 +145,54 @@ public class CustomerService {
 
         //return all info
         return balanceSummaryDTO;
+    }
+
+    public Flux<CustomerAndTypeDTO> getCustomerByIdentityNumber(String id) {
+        //get data from customers service using customerId
+        Flux<CustomerAndTypeDTO> customerAndType = customerRepository.findByIdentityNumber(id)
+                .flatMap(item -> {
+                    if (item.getType() == 1){
+                        //Personal
+                        return personalRepository.findById(item.getObjectId())
+                                    .map(type -> {
+                                        return new CustomerAndTypeDTO(item.getIdCustomer(), item.getName(), item.getBankId(), type.getDescription(), item.getIdentityNumber());
+                                    });
+
+                    } else if (item.getType() == 2) {
+                        //Business
+                        return businessRepository.findById(item.getObjectId())
+                                    .map(type -> {
+                                        return new CustomerAndTypeDTO(item.getIdCustomer(), item.getName(), item.getBankId(), type.getDescription(), item.getIdentityNumber());
+                                    });
+                    } else if (item.getType() == 3) {
+                        //VIP
+                        return vipRepository.findById(item.getObjectId())
+                                    .map(type -> {
+                                        return new CustomerAndTypeDTO(item.getIdCustomer(), item.getName(), item.getBankId(), type.getDescription(), item.getIdentityNumber());
+                                    });
+                    } else if (item.getType() == 4) {
+                        //PYME
+                        return pymeRepository.findById(item.getObjectId())
+                                    .map(type -> {
+                                        return new CustomerAndTypeDTO(item.getIdCustomer(), item.getName(), item.getBankId(), type.getDescription(), item.getIdentityNumber());
+                                    });
+                    } else {
+                        //Corporate
+                        return corporateRepository.findById(item.getObjectId())
+                                    .map(type -> {
+                                        return new CustomerAndTypeDTO(item.getIdCustomer(), item.getName(), item.getBankId(), type.getDescription(), item.getIdentityNumber());
+                                    });
+                    }
+
+                });
+
+        return customerAndType.flatMap(customer -> {
+            return WebClient.create(banksUri + "/bank/" + customer.getBankId())
+                    .get()
+                    .retrieve()
+                    .bodyToMono(BankDTO.class)
+                    .map(bank -> new CustomerAndTypeDTO(customer, bank.getName()))
+                    .defaultIfEmpty(customer);
+        });
     }
 }

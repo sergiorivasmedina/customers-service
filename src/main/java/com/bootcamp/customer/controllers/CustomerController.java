@@ -1,6 +1,7 @@
 package com.bootcamp.customer.controllers;
 
 import com.bootcamp.customer.dto.BalanceSummaryDTO;
+import com.bootcamp.customer.dto.CustomerAndTypeDTO;
 import com.bootcamp.customer.dto.CustomerDTO;
 import com.bootcamp.customer.model.Business;
 import com.bootcamp.customer.model.Corporate;
@@ -64,7 +65,7 @@ public class CustomerController {
             personalService.save(p)
                     .flatMap(per -> {
                         // adding a new customer to the collection
-                        Customer c = new Customer(newCustomerDTO.getName(), newCustomerDTO.getType(),per.getIdPersonal(), newCustomerDTO.getBankId());
+                        Customer c = new Customer(newCustomerDTO.getName(), newCustomerDTO.getType(),per.getIdPersonal(), newCustomerDTO.getIdentityNumber(), newCustomerDTO.getBankId());
                         return customerService.save(c);
                     })
                     .subscribe();
@@ -77,7 +78,7 @@ public class CustomerController {
             businessService.save(b)
                     .flatMap(bus -> {
                         // adding a new customer to the collection
-                        Customer c = new Customer(newCustomerDTO.getName(), newCustomerDTO.getType(),bus.getIdBusiness(), newCustomerDTO.getBankId());
+                        Customer c = new Customer(newCustomerDTO.getName(), newCustomerDTO.getType(),bus.getIdBusiness(), newCustomerDTO.getIdentityNumber(),newCustomerDTO.getBankId());
                         return customerService.save(c);
                     })
                     .subscribe();
@@ -86,7 +87,7 @@ public class CustomerController {
             Vip vip = new Vip("VIP", newCustomerDTO.getIdentityNumber());
             vipService.save(vip)
                 .flatMap(vipCustomer -> {
-                    Customer c = new Customer(newCustomerDTO.getName(), newCustomerDTO.getType(),vipCustomer.getDni(), newCustomerDTO.getBankId());
+                    Customer c = new Customer(newCustomerDTO.getName(), newCustomerDTO.getType(),vipCustomer.getIdVip(), newCustomerDTO.getIdentityNumber(), newCustomerDTO.getBankId());
                     return customerService.save(c);
                 })
                 .subscribe();
@@ -95,7 +96,7 @@ public class CustomerController {
             Pyme pyme = new Pyme("PYME", newCustomerDTO.getIdentityNumber());
             pymeService.save(pyme)
                 .flatMap(pymeCustomer -> {
-                    Customer c = new Customer(newCustomerDTO.getName(), newCustomerDTO.getType(),pymeCustomer.getRuc(), newCustomerDTO.getBankId());
+                    Customer c = new Customer(newCustomerDTO.getName(), newCustomerDTO.getType(),pymeCustomer.getIdPyme(), newCustomerDTO.getIdentityNumber(), newCustomerDTO.getBankId());
                     return customerService.save(c);
                 })
                 .subscribe();
@@ -104,7 +105,7 @@ public class CustomerController {
             Corporate corporate = new Corporate("Corporación", newCustomerDTO.getIdentityNumber());
             corporateService.save(corporate)
                 .flatMap(corp -> {
-                    Customer c = new Customer(newCustomerDTO.getName(), newCustomerDTO.getType(),corp.getRuc(), newCustomerDTO.getBankId());
+                    Customer c = new Customer(newCustomerDTO.getName(), newCustomerDTO.getType(),corp.getIdCorporate(), newCustomerDTO.getIdentityNumber(), newCustomerDTO.getBankId());
                     return customerService.save(c);
                 })
                 .subscribe();
@@ -135,7 +136,7 @@ public class CustomerController {
     @GetMapping(value = "/customer/name/{customerId}")
     public Mono<Customer> getCustomerName(@PathVariable(name = "customerId") String customerId) {
         return customerService.findById(customerId)
-                .defaultIfEmpty(new Customer("0","No se encontró cliente",0,"No se encontró identidad","No se encontró banco"));
+                .defaultIfEmpty(new Customer("0","No se encontró cliente",0,"No se encontró identidad",null, null));
     }
 
     //Balance Summary
@@ -143,4 +144,19 @@ public class CustomerController {
     public BalanceSummaryDTO balanaceSummary(@PathVariable(name = "customerId") String customerId) {
         return customerService.balanceSummary(customerId);
     }
+
+    //get customer by identity number (dni / ruc)
+    @GetMapping(value = "/customer/{customerIndentityNumber}")
+    public Flux<CustomerAndTypeDTO> getCustomerByIdentityNumber(@PathVariable(name = "customerIndentityNumber") String id){
+        return customerService.getCustomerByIdentityNumber(id);
+    }
+
+    //Perfil consolidado con todos los productos un cliente
+    // @GetMapping(value = "/bank/consolidated-profile/{customerId}")
+    // public void getConsolidatedProfile(@PathVariable(name = "customerId") String customerId) {
+    //     //get data from customers service using customerId
+    //     //get data from banks service using bankId
+    //     //get data from accounts service using customerId
+    //     //get data from credits service using customerId
+    // }
 }
