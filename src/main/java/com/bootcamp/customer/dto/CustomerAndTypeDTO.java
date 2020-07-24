@@ -1,6 +1,9 @@
 package com.bootcamp.customer.dto;
 
+import java.util.List;
+
 import lombok.Data;
+import reactor.core.publisher.Flux;
 
 @Data
 public class CustomerAndTypeDTO {
@@ -10,6 +13,7 @@ public class CustomerAndTypeDTO {
     private String bankName;
     private String description;
     private String identityNumber;
+    private List<AccountTypeCustomerDTO> accounts;
 
     public CustomerAndTypeDTO(String customerId, String name, String bankId, String description, String identityNumber) {
         this.customerId = customerId;

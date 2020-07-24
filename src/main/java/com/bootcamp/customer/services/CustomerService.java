@@ -2,7 +2,6 @@ package com.bootcamp.customer.services;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 import com.bootcamp.customer.dto.AccountTypeCustomerDTO;
 import com.bootcamp.customer.dto.BalanceSummaryDTO;
@@ -11,7 +10,6 @@ import com.bootcamp.customer.dto.BankDTO;
 import com.bootcamp.customer.dto.CreditDTO;
 import com.bootcamp.customer.dto.CustomerAndTypeDTO;
 import com.bootcamp.customer.model.Customer;
-import com.bootcamp.customer.model.Personal;
 import com.bootcamp.customer.repositories.BusinessRepository;
 import com.bootcamp.customer.repositories.CorporateRepository;
 import com.bootcamp.customer.repositories.CustomerRepository;
@@ -42,7 +40,7 @@ public class CustomerService {
     private final String creditsUri = "http://localhost:8083";
     private final String banksUri = "http://localhost:8084";
 
-    Logger logger = LoggerFactory.getLogger(CustomerService.class);
+    Logger log = LoggerFactory.getLogger(CustomerService.class);
 
     @Autowired
     private CustomerRepository customerRepository;
@@ -56,161 +54,195 @@ public class CustomerService {
     private PymeRepository pymeRepository;
     @Autowired
     private CorporateRepository corporateRepository;
-    
+
     @CircuitBreaker(name = "service1", fallbackMethod = "fallbackForFindAll")
     public Flux<Customer> findAll() {
         return customerRepository.findAll();
     }
 
-    //fallback
-    public Flux<Customer> fallbackForFindAll(Throwable t) {
-        logger.error("Inside Circuit Breaker fallbackForFindAll, cause {}", t.toString());
+    // fallback
+    public Flux<Customer> fallbackForFindAll(final Throwable t) {
+        log.error("Inside Circuit Breaker fallbackForFindAll, cause {}", t.toString());
         return Flux.empty();
     }
 
-    public Mono<Customer> save(Customer newCustomer) {
+    public Mono<Customer> save(final Customer newCustomer) {
         return customerRepository.save(newCustomer);
     }
 
-    public Mono<Customer> findById(String customerId) {
+    public Mono<Customer> findById(final String customerId) {
         return customerRepository.findById(customerId);
     }
 
-    public Mono<Void> delete(Customer customer) {
+    public Mono<Void> delete(final Customer customer) {
         return customerRepository.delete(customer);
     }
 
-    public BalanceSummaryDTO balanceSummary(String customerId){
-        
-        String jsonString;
-        BalanceSummaryDTO balanceSummaryDTO = new BalanceSummaryDTO();
-        RestTemplate restTemplate = new RestTemplate();
+    public BalanceSummaryDTO balanceSummary(final String customerId) {
 
-        HttpHeaders headers = new HttpHeaders();
+        String jsonString;
+        final BalanceSummaryDTO balanceSummaryDTO = new BalanceSummaryDTO();
+        final RestTemplate restTemplate = new RestTemplate();
+
+        final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        //search accounts for this customerId
+        // search accounts for this customerId
         jsonString = restTemplate.getForObject(accountsUri + "/account/search/" + customerId, String.class);
         JSONArray jsonArray = new JSONArray(jsonString);
 
-        List<BankAccountDTO> accountList = new ArrayList<BankAccountDTO>();
+        final List<BankAccountDTO> accountList = new ArrayList<BankAccountDTO>();
         for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject jsonObject = jsonArray.getJSONObject(i);
-            //search account type name
-            String accountTypeId = jsonObject.getString("accountType");
-            String accountTypeName = restTemplate.getForObject(accountsUri + "/account/type/search/"+ accountTypeId, String.class);
+            final JSONObject jsonObject = jsonArray.getJSONObject(i);
+            // search account type name
+            final String accountTypeId = jsonObject.getString("accountType");
+            final String accountTypeName = restTemplate.getForObject(accountsUri + "/account/type/search/" + accountTypeId,
+                    String.class);
 
-            //search currency name
-            String currencyId = jsonObject.getString("currency");
-            String currencyName = restTemplate.getForObject(accountsUri + "/currency/search/"+ currencyId, String.class);
+            // search currency name
+            final String currencyId = jsonObject.getString("currency");
+            final String currencyName = restTemplate.getForObject(accountsUri + "/currency/search/" + currencyId,
+                    String.class);
 
-            BankAccountDTO accountDTO = new BankAccountDTO(jsonObject.getString("idBankAccount"),
-                                        jsonObject.getDouble("availableBalance"), accountTypeName, currencyName);
-                                
+            final BankAccountDTO accountDTO = new BankAccountDTO(jsonObject.getString("idBankAccount"),
+                    jsonObject.getDouble("availableBalance"), accountTypeName, currencyName);
+
             accountList.add(accountDTO);
         }
 
         balanceSummaryDTO.setAccounts(accountList);
 
-        //Search credits for this idCustomer
-        jsonString = restTemplate.getForObject(creditsUri + "/credit/search/"+ customerId, String.class);
+        // Search credits for this idCustomer
+        jsonString = restTemplate.getForObject(creditsUri + "/credit/search/" + customerId, String.class);
         jsonArray = new JSONArray(jsonString);
 
-        List<CreditDTO> creditList = new ArrayList<CreditDTO>();
+        final List<CreditDTO> creditList = new ArrayList<CreditDTO>();
         for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject jsonObject = jsonArray.getJSONObject(i);
+            final JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-            //search credit tye name
-            String creditTypeId = jsonObject.getString("creditType");
-            String creditTypeName = restTemplate.getForObject(creditsUri + "/credit/type/"+ creditTypeId, String.class);
+            // search credit tye name
+            final String creditTypeId = jsonObject.getString("creditType");
+            final String creditTypeName = restTemplate.getForObject(creditsUri + "/credit/type/" + creditTypeId,
+                    String.class);
 
-            //search currency name
-            String currencyId = jsonObject.getString("idCurrency");
-            String currencyName = restTemplate.getForObject(creditsUri + "/currency/search/"+ currencyId, String.class);
+            // search currency name
+            final String currencyId = jsonObject.getString("idCurrency");
+            final String currencyName = restTemplate.getForObject(creditsUri + "/currency/search/" + currencyId,
+                    String.class);
 
-            CreditDTO creditDTO = new CreditDTO(jsonObject.getString("idCredit"), jsonObject.getDouble("availableAmount"),
-                        creditTypeName, currencyName, jsonObject.getDouble("consumedAmount"), jsonObject.getDouble("limit"));
+            final CreditDTO creditDTO = new CreditDTO(jsonObject.getString("idCredit"),
+                    jsonObject.getDouble("availableAmount"), creditTypeName, currencyName,
+                    jsonObject.getDouble("consumedAmount"), jsonObject.getDouble("limit"));
 
             creditList.add(creditDTO);
         }
 
         balanceSummaryDTO.setCredits(creditList);
 
-        //BalanceSummaryDTO
+        // BalanceSummaryDTO
         balanceSummaryDTO.setIdCustomer(customerId);
 
-        String customerString = restTemplate.getForObject(customersUri + "/customer/name/"+ customerId, String.class);
-        JSONObject customer = new JSONObject(customerString);
+        final String customerString = restTemplate.getForObject(customersUri + "/customer/name/" + customerId, String.class);
+        final JSONObject customer = new JSONObject(customerString);
 
         balanceSummaryDTO.setCustomerName(customer.getString("name"));
 
-        //return all info
+        // return all info
         return balanceSummaryDTO;
     }
 
-    public Flux<CustomerAndTypeDTO> getCustomerByIdentityNumber(String id) {
-        //get data from customers service using customerId
-        Flux<CustomerAndTypeDTO> customerAndType = customerRepository.findByIdentityNumber(id)
-                .flatMap(item -> {
-                    if (item.getType() == 1){
-                        //Personal
-                        return personalRepository.findById(item.getObjectId())
-                                    .map(type -> {
-                                        return new CustomerAndTypeDTO(item.getIdCustomer(), item.getName(), item.getBankId(), type.getDescription(), item.getIdentityNumber());
-                                    });
-
-                    } else if (item.getType() == 2) {
-                        //Business
-                        return businessRepository.findById(item.getObjectId())
-                                    .map(type -> {
-                                        return new CustomerAndTypeDTO(item.getIdCustomer(), item.getName(), item.getBankId(), type.getDescription(), item.getIdentityNumber());
-                                    });
-                    } else if (item.getType() == 3) {
-                        //VIP
-                        return vipRepository.findById(item.getObjectId())
-                                    .map(type -> {
-                                        return new CustomerAndTypeDTO(item.getIdCustomer(), item.getName(), item.getBankId(), type.getDescription(), item.getIdentityNumber());
-                                    });
-                    } else if (item.getType() == 4) {
-                        //PYME
-                        return pymeRepository.findById(item.getObjectId())
-                                    .map(type -> {
-                                        return new CustomerAndTypeDTO(item.getIdCustomer(), item.getName(), item.getBankId(), type.getDescription(), item.getIdentityNumber());
-                                    });
-                    } else {
-                        //Corporate
-                        return corporateRepository.findById(item.getObjectId())
-                                    .map(type -> {
-                                        return new CustomerAndTypeDTO(item.getIdCustomer(), item.getName(), item.getBankId(), type.getDescription(), item.getIdentityNumber());
-                                    });
-                    }
-
+    public Flux<CustomerAndTypeDTO> getCustomerByIdentityNumber(final String id) {
+        // get data from customers service using indentityNumber
+        Flux<CustomerAndTypeDTO> customerAndType = customerRepository.findByIdentityNumber(id).flatMap(item -> {
+            if (item.getType() == 1) {
+                // Personal
+                return personalRepository.findById(item.getObjectId()).map(type -> {
+                    return new CustomerAndTypeDTO(item.getIdCustomer(), item.getName(), item.getBankId(),
+                            type.getDescription(), item.getIdentityNumber());
                 });
 
+            } else if (item.getType() == 2) {
+                // Business
+                return businessRepository.findById(item.getObjectId()).map(type -> {
+                    return new CustomerAndTypeDTO(item.getIdCustomer(), item.getName(), item.getBankId(),
+                            type.getDescription(), item.getIdentityNumber());
+                });
+            } else if (item.getType() == 3) {
+                // VIP
+                return vipRepository.findById(item.getObjectId()).map(type -> {
+                    return new CustomerAndTypeDTO(item.getIdCustomer(), item.getName(), item.getBankId(),
+                            type.getDescription(), item.getIdentityNumber());
+                });
+            } else if (item.getType() == 4) {
+                // PYME
+                return pymeRepository.findById(item.getObjectId()).map(type -> {
+                    return new CustomerAndTypeDTO(item.getIdCustomer(), item.getName(), item.getBankId(),
+                            type.getDescription(), item.getIdentityNumber());
+                });
+            } else {
+                // Corporate
+                return corporateRepository.findById(item.getObjectId()).map(type -> {
+                    return new CustomerAndTypeDTO(item.getIdCustomer(), item.getName(), item.getBankId(),
+                            type.getDescription(), item.getIdentityNumber());
+                });
+            }
+
+        });
+
         customerAndType = customerAndType.flatMap(customer -> {
-            return WebClient.create(banksUri + "/bank/" + customer.getBankId())
+            // get bank name
+            return WebClient.create(banksUri + "/bank/" + customer.getBankId()).get().retrieve()
+                    .bodyToMono(BankDTO.class).map(bank -> new CustomerAndTypeDTO(customer, bank.getName()))
+                    .defaultIfEmpty(customer);
+        });
+
+        //get accounts
+        customerAndType = customerAndType.flatMap(cat -> {
+            log.info("---cat: " + cat.toString());
+
+            return WebClient.create(accountsUri + "/account/search/" + cat.getCustomerId())
                     .get()
                     .retrieve()
-                    .bodyToMono(BankDTO.class)
-                    .map(bank -> new CustomerAndTypeDTO(customer, bank.getName()))
-                    .defaultIfEmpty(customer);
+                    .bodyToFlux(AccountTypeCustomerDTO.class)
+                    .flatMap(atc -> {
+                        log.info("---atc: " + atc.toString());
+                        return WebClient.create(accountsUri + "/account/type/search/" + atc.getAccountType())
+                                .get()
+                                .accept(MediaType.TEXT_PLAIN).retrieve().toEntity(String.class)
+                                .map(item -> {
+                                    log.info("---item: " + item.getBody());
+                                    atc.setName(item.getBody());
+                                    //assign
+                                    List<AccountTypeCustomerDTO> listAtc;
+                                    if (cat.getAccounts() == null) {
+                                        listAtc = new ArrayList<AccountTypeCustomerDTO>();
+                                    } else {
+                                        listAtc = cat.getAccounts();
+                                    }
+                                    listAtc.add(atc);
+                                    cat.setAccounts(listAtc);
+                                    return cat;
+                                });
+                    });
         });
 
         return customerAndType;
     }
 
-    public Flux<AccountTypeCustomerDTO> getAccountInfoByCustomerId(String customerId) {
+    public Flux<AccountTypeCustomerDTO> getAccountInfoByCustomerId(final String customerId) {
         return WebClient.create(accountsUri + "/account/search/" + customerId)
                 .get()
                 .retrieve()
                 .bodyToFlux(AccountTypeCustomerDTO.class)
                 .flatMap(atc -> {
+                    System.out.println("---atc: " + atc.toString());
                     return WebClient.create(accountsUri + "/account/type/search/" + atc.getAccountType())
                             .get()
                             .accept(MediaType.TEXT_PLAIN)
                             .retrieve()
                             .toEntity(String.class)
                             .map(item -> {
+                                System.out.println("---item: " + item.toString());
                                 atc.setName(item.getBody());
                                 return atc;
                             });
