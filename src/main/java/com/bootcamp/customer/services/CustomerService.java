@@ -203,11 +203,22 @@ public class CustomerService {
                 .retrieve()
                 .bodyToFlux(AccountTypeCustomerDTO.class)
                 .flatMap(account -> {
+                    //get type account name
                     return WebClient.create(accountsUri + "/account/type/search/" + account.getAccountType())
                         .get()
                         .accept(MediaType.TEXT_PLAIN).retrieve().toEntity(String.class)
                         .map(item -> {
                             account.setName(item.getBody());
+                            return account;
+                        });
+                })
+                .flatMap(account -> {
+                    //get currency name
+                    return WebClient.create(accountsUri + "/currency/search/" + account.getCurrency())
+                        .get()
+                        .accept(MediaType.TEXT_PLAIN).retrieve().toEntity(String.class)
+                        .map(item -> {
+                            account.setCurrencyName(item.getBody());
                             return account;
                         });
                 })
@@ -218,27 +229,14 @@ public class CustomerService {
                 });
         });
 
-        return customerAndType;
-    }
+        //get credits
+        // customerAndType = customerAndType.flatMap(cat -> {
+        //     return WebClient.create(creditsUri + "/credit/search/" + cat.getCustomerId())
+        //         .get()
+        //         .retrieve()
+        //         .bodyToFlux(elementClass)
+        // })
 
-    //borrar luego
-    public Flux<AccountTypeCustomerDTO> getAccountInfoByCustomerId(final String customerId) {
-        return WebClient.create(accountsUri + "/account/search/" + customerId)
-                .get()
-                .retrieve()
-                .bodyToFlux(AccountTypeCustomerDTO.class)
-                .flatMap(atc -> {
-                    System.out.println("---atc: " + atc.toString());
-                    return WebClient.create(accountsUri + "/account/type/search/" + atc.getAccountType())
-                            .get()
-                            .accept(MediaType.TEXT_PLAIN)
-                            .retrieve()
-                            .toEntity(String.class)
-                            .map(item -> {
-                                System.out.println("---item: " + item.toString());
-                                atc.setName(item.getBody());
-                                return atc;
-                            });
-                });
+        return customerAndType;
     }
 }

@@ -1,6 +1,5 @@
 package com.bootcamp.customer.controllers;
 
-import com.bootcamp.customer.dto.AccountTypeCustomerDTO;
 import com.bootcamp.customer.dto.BalanceSummaryDTO;
 import com.bootcamp.customer.dto.CustomerAndTypeDTO;
 import com.bootcamp.customer.dto.CustomerDTO;
@@ -150,10 +149,5 @@ public class CustomerController {
     @GetMapping(value = "/customer/{customerIndentityNumber}")
     public Flux<CustomerAndTypeDTO> getCustomerByIdentityNumber(@PathVariable(name = "customerIndentityNumber") String id){
         return customerService.getCustomerByIdentityNumber(id);
-    }
-
-    @GetMapping(value = "/hola/{customerId}")
-    public Flux<AccountTypeCustomerDTO> getHola(@PathVariable(name = "customerId") String customerId) {
-        return customerService.getAccountInfoByCustomerId(customerId);
     }
 }
