@@ -13,6 +13,7 @@ public class CustomerAndTypeDTO {
     private String description;
     private String identityNumber;
     private List<AccountTypeCustomerDTO> accounts;
+    private List<CreditCustomerDTO> credits;
 
     public CustomerAndTypeDTO(String customerId, String name, String bankId, String description, String identityNumber) {
         this.customerId = customerId;

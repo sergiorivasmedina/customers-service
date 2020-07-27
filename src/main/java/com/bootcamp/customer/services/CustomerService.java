@@ -7,6 +7,7 @@ import com.bootcamp.customer.dto.AccountTypeCustomerDTO;
 import com.bootcamp.customer.dto.BalanceSummaryDTO;
 import com.bootcamp.customer.dto.BankAccountDTO;
 import com.bootcamp.customer.dto.BankDTO;
+import com.bootcamp.customer.dto.CreditCustomerDTO;
 import com.bootcamp.customer.dto.CreditDTO;
 import com.bootcamp.customer.dto.CustomerAndTypeDTO;
 import com.bootcamp.customer.model.Customer;
@@ -230,12 +231,37 @@ public class CustomerService {
         });
 
         //get credits
-        // customerAndType = customerAndType.flatMap(cat -> {
-        //     return WebClient.create(creditsUri + "/credit/search/" + cat.getCustomerId())
-        //         .get()
-        //         .retrieve()
-        //         .bodyToFlux(elementClass)
-        // })
+        customerAndType = customerAndType.flatMap(cat -> {
+            return WebClient.create(creditsUri + "/credit/search/" + cat.getCustomerId())
+                .get()
+                .retrieve()
+                .bodyToFlux(CreditCustomerDTO.class)
+                .flatMap(credit -> {
+                    //get currency name
+                    return WebClient.create(creditsUri + "currency/search/" + credit.getIdCurrency())
+                        .get()
+                        .accept(MediaType.TEXT_PLAIN).retrieve().toEntity(String.class)
+                        .map(item -> {
+                            credit.setCurrencyName(item.getBody());
+                            return credit;
+                        });
+                })
+                .flatMap(credit -> {
+                    //get credit type name
+                    return WebClient.create(creditsUri + "/credit/types/" + credit.getCreditType())
+                        .get()
+                        .accept(MediaType.TEXT_PLAIN).retrieve().toEntity(String.class)
+                        .map(item -> {
+                            credit.setCreditName(item.getBody());
+                            return credit;
+                        });
+                })
+                .collectList()
+                .map(credit -> {
+                    cat.setCredits(credit);
+                    return cat;
+                });
+        });
 
         return customerAndType;
     }
