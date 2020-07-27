@@ -198,37 +198,30 @@ public class CustomerService {
 
         //get accounts
         customerAndType = customerAndType.flatMap(cat -> {
-            log.info("---cat: " + cat.toString());
-
             return WebClient.create(accountsUri + "/account/search/" + cat.getCustomerId())
-                    .get()
-                    .retrieve()
-                    .bodyToFlux(AccountTypeCustomerDTO.class)
-                    .flatMap(atc -> {
-                        log.info("---atc: " + atc.toString());
-                        return WebClient.create(accountsUri + "/account/type/search/" + atc.getAccountType())
-                                .get()
-                                .accept(MediaType.TEXT_PLAIN).retrieve().toEntity(String.class)
-                                .map(item -> {
-                                    log.info("---item: " + item.getBody());
-                                    atc.setName(item.getBody());
-                                    //assign
-                                    List<AccountTypeCustomerDTO> listAtc;
-                                    if (cat.getAccounts() == null) {
-                                        listAtc = new ArrayList<AccountTypeCustomerDTO>();
-                                    } else {
-                                        listAtc = cat.getAccounts();
-                                    }
-                                    listAtc.add(atc);
-                                    cat.setAccounts(listAtc);
-                                    return cat;
-                                });
-                    });
+                .get()
+                .retrieve()
+                .bodyToFlux(AccountTypeCustomerDTO.class)
+                .flatMap(account -> {
+                    return WebClient.create(accountsUri + "/account/type/search/" + account.getAccountType())
+                        .get()
+                        .accept(MediaType.TEXT_PLAIN).retrieve().toEntity(String.class)
+                        .map(item -> {
+                            account.setName(item.getBody());
+                            return account;
+                        });
+                })
+                .collectList()
+                .map(account -> {
+                    cat.setAccounts(account);
+                    return cat;
+                });
         });
 
         return customerAndType;
     }
 
+    //borrar luego
     public Flux<AccountTypeCustomerDTO> getAccountInfoByCustomerId(final String customerId) {
         return WebClient.create(accountsUri + "/account/search/" + customerId)
                 .get()

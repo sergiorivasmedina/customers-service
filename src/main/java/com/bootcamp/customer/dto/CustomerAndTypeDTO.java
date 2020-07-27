@@ -3,7 +3,6 @@ package com.bootcamp.customer.dto;
 import java.util.List;
 
 import lombok.Data;
-import reactor.core.publisher.Flux;
 
 @Data
 public class CustomerAndTypeDTO {
